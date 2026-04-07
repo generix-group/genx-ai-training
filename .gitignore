@@ -1,0 +1,66 @@
+# GLOBAL / OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+*.log
+*.cache
+*.pid
+
+#  IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.vscode/
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+.recommenders/
+.loadpath
+.mvn/timing.properties
+.factorypath
+.springBeans
+.sts4-cache/
+
+# Java / Maven / Build
+target/
+build/
+dependency-reduced-pom.xml
+
+# Logs / Observabilité
+logs/
+log/
+*.json.log
+*.lck
+
+# Secrets / Security / Vault
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+*.truststore
+vault/
+secrets/
+*.enc
+
+#  Docker / Containers
+docker-data/
+docker-volumes/
+*.tar
+*.tar.gz
+*.zip
+docker-compose.override.yml
+
+# Generated files (MapStruct / Lombok)
+generated-sources/
+generated/
+annotations/

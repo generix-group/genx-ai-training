@@ -1,0 +1,11 @@
+                                                      o8o              .                       o8o               o8o
+                                                      `"'            .o8                       `"'               `"'
+ .oooooooo ooo. .oo.   oooo    ooo          .oooo.   oooo          .o888oo oooo d8b  .oooo.   oooo  ooo. .oo.   oooo  ooo. .oo.    .oooooooo
+888' `88b  `888P"Y88b   `88b..8P'          `P  )88b  `888            888   `888""8P `P  )88b  `888  `888P"Y88b  `888  `888P"Y88b  888' `88b
+888   888   888   888     Y888'    8888888  .oP"888   888  8888888   888    888      .oP"888   888   888   888   888   888   888  888   888
+`88bod8P'   888   888   .o8"'88b           d8(  888   888            888 .  888     d8(  888   888   888   888   888   888   888  `88bod8P'
+`8oooooo.  o888o o888o o88'   888o         `Y888""8o o888o           "888" d888b    `Y888""8o o888o o888o o888o o888o o888o o888o `8oooooo.
+d"     YD                                                                                                                         d"     YD
+"Y88888P'                                                                                                                         "Y88888P'
+
+${info.app.name} ${info.app.version}

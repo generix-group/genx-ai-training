@@ -1,0 +1,50 @@
+info:
+  app:
+    name: gnx-ai-training
+    description: AI training Spring Boot project
+    version: 1.0.0
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: gnx-ai-training
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/gnxaitraining}
+    username: ${SPRING_DATASOURCE_USERNAME:pgadmin}
+    password: ${SPRING_DATASOURCE_PASSWORD:pgadmin}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_EXPOSED_ENDPOINTS:health,info,prometheus,metrics}
+  endpoint:
+    health:
+      show-details: always
+  info:
+    build:
+      enabled: true
+    env:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
