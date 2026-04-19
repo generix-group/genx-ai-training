@@ -2,9 +2,7 @@ package com.generixgroup.gnxaitraining.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
@@ -37,17 +35,15 @@ public class Client {
 
   @Schema(description = "Client email", example = "john.doe@example.com")
   @NotBlank
-  @Email
   @Size(max = 255)
   private String email;
 
-  @Schema(description = "Client phone number", example = "+1-514-555-0101")
+  @Schema(description = "Client phone number", example = "+1-514-555-0101", hidden = true)
   @NotBlank
   @Size(max = 30)
   private String phoneNumber;
 
   @Valid
-  @NotEmpty
   @Schema(description = "Client addresses")
   private List<Address> addresses;
 }

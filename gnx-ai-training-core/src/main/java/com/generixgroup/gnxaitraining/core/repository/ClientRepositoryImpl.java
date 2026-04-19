@@ -7,6 +7,7 @@ import com.generixgroup.gnxaitraining.infrastructure.persistence.ClientSpecifica
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -41,6 +42,7 @@ public class ClientRepositoryImpl implements ClientRepository {
     final var specification =
         ClientSpecifications.build(
             criteria.firstName(), criteria.lastName(), criteria.email(), criteria.phoneNumber());
-    return clientJpaRepository.findAll(specification, pageable);
+    final var clients = clientJpaRepository.findAll(specification);
+    return new PageImpl<>(clients, pageable, clients.size());
   }
 }

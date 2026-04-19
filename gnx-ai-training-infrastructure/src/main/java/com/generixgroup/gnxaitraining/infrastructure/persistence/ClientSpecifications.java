@@ -1,7 +1,6 @@
 package com.generixgroup.gnxaitraining.infrastructure.persistence;
 
 import com.generixgroup.gnxaitraining.domain.entity.ClientEntity;
-import java.util.Locale;
 import org.springframework.data.jpa.domain.Specification;
 
 public final class ClientSpecifications {
@@ -15,7 +14,6 @@ public final class ClientSpecifications {
     specification = andIfHasText(specification, firstName, "firstName");
     specification = andIfHasText(specification, lastName, "lastName");
     specification = andIfHasText(specification, email, "email");
-    specification = andIfHasText(specification, phoneNumber, "phoneNumber");
     return specification;
   }
 
@@ -34,12 +32,11 @@ public final class ClientSpecifications {
   private static Specification<ClientEntity> containsIgnoreCase(
       final String attributeName, final String value) {
     return (root, query, criteriaBuilder) ->
-        criteriaBuilder.like(
-            criteriaBuilder.lower(root.get(attributeName)), toContainsPattern(value));
+        criteriaBuilder.like(root.get(attributeName), toContainsPattern(value));
   }
 
   private static String toContainsPattern(final String value) {
-    return "%" + value.toLowerCase(Locale.ENGLISH) + "%";
+    return "%" + value + "%";
   }
 
   private static boolean hasText(final String value) {

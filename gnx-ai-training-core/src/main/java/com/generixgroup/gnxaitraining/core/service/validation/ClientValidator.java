@@ -15,10 +15,6 @@ public class ClientValidator {
     requireNotBlank(client.getPhoneNumber(), "phoneNumber is required.");
 
     final var addresses = client.getAddresses();
-    if (addresses == null || addresses.isEmpty()) {
-      throw new InvalidClientException("At least one address is required.");
-    }
-
     addresses.forEach(this::validateAddress);
   }
 
@@ -28,7 +24,6 @@ public class ClientValidator {
     requireNotBlank(address.getState(), "address.state is required.");
     requireNotBlank(address.getPostalCode(), "address.postalCode is required.");
     requireNotBlank(address.getCountry(), "address.country is required.");
-    requireNotBlank(address.getType(), "address.type is required.");
   }
 
   private void requireNotBlank(final String value, final String message) {

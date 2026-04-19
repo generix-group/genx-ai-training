@@ -101,6 +101,6 @@ public class ClientController {
   @Operation(summary = "Delete a client")
   public ResponseEntity<Void> delete(@PathVariable final UUID clientId) {
     clientService.delete(clientId);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok().build();
   }
 }

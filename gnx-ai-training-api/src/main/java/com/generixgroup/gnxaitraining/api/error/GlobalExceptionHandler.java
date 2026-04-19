@@ -41,12 +41,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .map(this::toFieldValidationError)
             .toList();
 
-    log.warn(
-        "Validation error [correlationId={}, path={}, errorsCount={}]",
-        correlationId,
-        path,
-        fieldErrors.size(),
-        exception);
 
     final var body =
         ApiError.builder()
@@ -129,22 +123,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       final Exception exception) {
 
     if (status.is5xxServerError()) {
-      log.error(
-          "Unhandled error [code={}, correlationId={}, path={}]",
-          code,
-          correlationId,
-          path,
-          exception);
+      log.error("Unhandled error [code={}]", code, exception);
       return;
     }
 
     if (status.is4xxClientError()) {
-      log.warn(
-          "Client error [code={}, correlationId={}, path={}, message={}]",
-          code,
-          correlationId,
-          path,
-          exception.getMessage());
+      log.info("Client error [message={}]", exception.getMessage());
     }
   }
 }

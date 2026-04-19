@@ -16,11 +16,11 @@ public class ClientUpdater {
   }
 
   public void applyPatch(final ClientEntity target, final ClientEntity source) {
-    apply(target, source.getFirstName(), ClientEntity::setFirstName, true);
-    apply(target, source.getLastName(), ClientEntity::setLastName, true);
-    apply(target, source.getEmail(), ClientEntity::setEmail, true);
-    apply(target, source.getPhoneNumber(), ClientEntity::setPhoneNumber, true);
-    apply(target, source.getAddresses(), ClientEntity::replaceAddresses, true);
+    apply(target, source.getFirstName(), ClientEntity::setFirstName, false);
+    apply(target, source.getLastName(), ClientEntity::setLastName, false);
+    apply(target, source.getEmail(), ClientEntity::setEmail, false);
+    apply(target, source.getPhoneNumber(), ClientEntity::setPhoneNumber, false);
+    apply(target, source.getAddresses(), ClientEntity::replaceAddresses, false);
   }
 
   private <T> void apply(
