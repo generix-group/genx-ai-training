@@ -39,7 +39,7 @@ public final class ClientSpecifications {
   }
 
   private static String toContainsPattern(final String value) {
-    return "%" + value.toLowerCase(Locale.ENGLISH) + "%";
+    return "%" + value + "%";
   }
 
   private static boolean hasText(final String value) {
