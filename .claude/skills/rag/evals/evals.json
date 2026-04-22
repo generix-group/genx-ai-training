@@ -1,0 +1,29 @@
+{
+  "skill_name": "rag",
+  "evals": [
+    {
+      "id": 0,
+      "name": "entity-graph-and-pageable",
+      "prompt": "Someone says @EntityGraph works the same with Pageable as without — meaning you can LEFT JOIN FETCH a collection and paginate in the same query. Is that right for Spring Data JPA 3.x? Check the documentation.",
+      "expected_output": "Fetches the Spring Data JPA 3.x reference for @EntityGraph + Pageable. Explains that Hibernate cannot LIMIT/OFFSET when a collection fetch is involved — it applies pagination in memory (HHH000104 warning) OR Spring Data splits the query into keys + fetch. Cites the specific doc section. Warns against naive assumptions.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "jackson-jsonmerge-vs-rfc-7386",
+      "prompt": "I want to use Jackson's @JsonMerge annotation for partial updates instead of RFC 7386 JSON Merge Patch + our JsonMergePatchUtils. What does Jackson's documentation say about how @JsonMerge interacts with null values? Would it replicate our current PATCH behavior?",
+      "expected_output": "Fetches Jackson docs on @JsonMerge. Explains that @JsonMerge by default merges objects/collections but the null-value semantics differ from RFC 7386 (Jackson's default is to replace; 7386 says null deletes). Recommends keeping JsonMergePatchUtils because the project contract is explicitly RFC 7386 compliant. Cites docs.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "postgres-16-indexing-for-ilike",
+      "prompt": "Our case-insensitive search uses a LOWER() function index on firstName/lastName/email. Does PostgreSQL 16 have a better option — something that doesn't require rewriting queries to use LOWER() — that we should migrate to?",
+      "expected_output": "Fetches PG 16 docs on indexing. Mentions citext extension, pg_trgm for substring match, and case-insensitive collations (icu collation with deterministic=false) as alternatives. Compares trade-offs vs LOWER() expression index. Does not recommend a change unilaterally — flags that the existing approach works and migration cost is non-trivial.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

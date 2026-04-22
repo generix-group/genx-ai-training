@@ -1,0 +1,29 @@
+{
+  "skill_name": "logging",
+  "evals": [
+    {
+      "id": 0,
+      "name": "add-logging-to-service-create",
+      "prompt": "Add appropriate logging to ClientService.create — we're losing track of who created what and when in the logs. Don't go overboard.",
+      "expected_output": "Adds @Slf4j to the service. One INFO log after successful save with structured fields (clientId, maybe firstName as a non-PII identifier — debatable, mentioned as trade-off). Does NOT log email, phoneNumber, or the full request body. Does NOT add DEBUG noise to every method. Does NOT log-and-rethrow on exceptions (GlobalExceptionHandler already does that).",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "audit-global-exception-handler",
+      "prompt": "Review GlobalExceptionHandler's logging. Is anything missing for ops? What should we add or change?",
+      "expected_output": "Accurately describes current behavior: 5xx logged at ERROR with stack trace, 4xx (handled exceptions) logged at INFO with message only, bean-validation 400s not logged at all, correlationId generated per error but returned only in ApiError (never pushed to MDC). Flags gaps like: correlationId not in MDC (so upstream request logs can't be grouped — recommend a filter), handleMethodArgumentNotValid silently drops validation failures (hard to diagnose 400 spikes), INFO for 4xx may under-warn on genuinely unexpected client errors, no standardized structured field names. Ranks by severity.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "pii-leak-audit",
+      "prompt": "Security flagged that we might be logging email addresses or phone numbers somewhere. Audit our logging statements across the codebase and flag any PII leaks. Recommend fixes.",
+      "expected_output": "Greps for log statements referencing email, phoneNumber, lastName across the codebase. For each finding, classifies severity (definite PII, possibly scrub-safe, unclear). Fixes either replace the PII field with clientId or remove it entirely from the log line. Does NOT blanket-disable the logs.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

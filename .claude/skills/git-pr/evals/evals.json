@@ -1,0 +1,29 @@
+{
+  "skill_name": "git-pr",
+  "evals": [
+    {
+      "id": 0,
+      "name": "ship-a-feature-branch",
+      "prompt": "I've modified ClientController.java and added a new Flyway migration V5__add_client_notes.sql. Walk me through getting this committed, formatted, pushed, and a PR opened. Title for the PR should mention 'add client notes endpoint'.",
+      "expected_output": "Steps in order: (1) branch feat/client-notes, (2) mvn git-code-format:format-code, (3) stage specific files (not git add .), (4) commit with imperative subject, (5) mvn clean install -DskipTests, (6) push with -u, (7) gh pr create with a body using the project template (Summary / Changes / How to verify). Mentions that the migration is immutable once applied in any env.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "format-check-failing-in-ci",
+      "prompt": "CI is failing on the validate-code-format step but my IDE isn't showing any formatting issues. How do I fix this?",
+      "expected_output": "Explains the git-code-format-maven-plugin enforces Google Java Format, which may differ from the IDE's default. The fix is mvn git-code-format:format-code, commit, push. Warns against editing the plugin config to silence the check.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "accidentally-committed-env-file",
+      "prompt": "I accidentally committed my local .env file with DB passwords to the feature branch. I haven't pushed yet. How do I clean this up safely?",
+      "expected_output": "Step 1: ROTATE the passwords (they may already be exposed via local tooling / backups). Step 2: git rm --cached .env + add .env to .gitignore + amend the commit (safe here because not pushed). Warns that if the branch had been pushed, history rewrite is required and the credentials should be treated as leaked.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

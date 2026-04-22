@@ -1,0 +1,29 @@
+{
+  "skill_name": "api-consistency",
+  "evals": [
+    {
+      "id": 0,
+      "name": "new-resource-follows-conventions",
+      "prompt": "Add a POST /api/v1/clients/{clientId}/notes endpoint that creates a note attached to a client. Body has a single 'text' field (required, non-blank, max 2000 chars). Return the created note. Follow all our existing REST conventions — look at ClientController for reference.",
+      "expected_output": "Controller under /api/v1/clients with a POST method returning 200 OK with the note DTO, @Valid on @RequestBody, @Operation summary, proper error propagation via GlobalExceptionHandler (no manual ResponseStatusException for validation), and the same module layering as the existing client code.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "error-envelope-audit",
+      "prompt": "Ops is complaining that when /api/v1/clients 5xx errors they can't cross-reference the response with log entries. Audit our error-response path and tell me whether the error envelope already supports this, or what needs to change.",
+      "expected_output": "Identifies that ApiError already carries a correlationId which GlobalExceptionHandler stamps into ERROR-level logs. Recommends no code change unless log shipping is dropping the field. Bonus: suggests adding a request-scoped filter to propagate correlationId through successful requests too, for non-error traceability.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "delete-status-inconsistency",
+      "prompt": "Our ClientController.delete returns 200 OK with no body. A new team member says it should be 204 No Content per REST convention. Is that right for this project? What should I do?",
+      "expected_output": "Flags that 204 is indeed the REST-idiomatic choice, but the project convention is 200 with empty body (per ClientController.delete). Recommends surfacing the inconsistency to the user and NOT changing it unilaterally — changing a status code is a breaking change for clients that check for == 200.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

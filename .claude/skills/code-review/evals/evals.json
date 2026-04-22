@@ -1,0 +1,29 @@
+{
+  "skill_name": "code-review",
+  "evals": [
+    {
+      "id": 0,
+      "name": "review-client-controller",
+      "prompt": "Review ClientController in gnx-ai-training-api against our conventions. Flag anything that's out of line with the module boundaries, Lombok/MapStruct usage, pagination, error handling, or Swagger annotations. Don't rewrite — just list findings ranked by severity.",
+      "expected_output": "A ranked findings list: confirms what's good (pattern matches conventions), flags the ClientRepositoryImpl.search bug called out by the pagination skill (non-paginated findAll + PageImpl wrap), and possibly notes the @Operation summaries are present but could be more descriptive. Does NOT rewrite the controller.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "review-new-service-class",
+      "prompt": "I just wrote a new service called InvoiceServiceImpl that has: a constructor taking 3 dependencies (no @RequiredArgsConstructor), manual DTO-to-entity mapping methods inline (no MapStruct), a findAll() method returning List<InvoiceDto> with no pagination, and it catches exceptions and returns a custom error response object. Review before I commit.",
+      "expected_output": "Flags four violations clearly: (1) use @RequiredArgsConstructor instead of hand-written constructor, (2) move mapping to a MapStruct @Mapper in api/mapper/, (3) return Page<InvoiceDto> with Pageable instead of List<>, (4) throw a domain exception and let GlobalExceptionHandler emit ApiError instead of custom error responses. Ranks by severity; doesn't rewrite the whole class.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "review-missing-after-mapping",
+      "prompt": "My coworker wrote a MapStruct mapper for Order/OrderEntity but skipped the @AfterMapping for the bidirectional Order→OrderLine relationship. Is that a problem? What would it break?",
+      "expected_output": "Explains that without @AfterMapping, the inverse side of the relationship (OrderLine.order) won't be set after mapping, which causes either (a) a null foreign key on cascade save, or (b) orphan rows the ORM can't navigate back. Points to ClientMapper's address wiring as the reference pattern. Suggests adding the @AfterMapping hook.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

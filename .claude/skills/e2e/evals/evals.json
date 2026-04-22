@@ -1,0 +1,29 @@
+{
+  "skill_name": "e2e",
+  "evals": [
+    {
+      "id": 0,
+      "name": "full-crud-sweep",
+      "prompt": "Smoke-test the /api/v1/clients CRUD end-to-end against the running app. Exercise POST, GET by id, GET search, PUT, PATCH, DELETE. Tell me what works, what doesn't, and any edge cases I should care about.",
+      "expected_output": "A step-by-step plan with curl or HTTP-file commands starting from docker compose up, /actuator/health, then the 6 operations. Captures the generated id, uses it in subsequent calls, runs a DELETE-then-GET to confirm 404, and lists 2-3 edge cases (validation 400, PATCH null semantics, pagination). No project source files modified.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "pagination-total-elements-audit",
+      "prompt": "I think I broke pagination. Run a script that POSTs 150 clients, then GETs /api/v1/clients with size=100, and tell me whether totalElements is right. Don't modify the app code — just test it.",
+      "expected_output": "Seed script posts 150 clients with distinct data, then verifies GET /api/v1/clients?size=100 returns totalElements=150, totalPages=2, first=true, last=false. If the response is wrong (e.g. totalElements=100 because of the ClientRepositoryImpl.search bug) it flags that clearly with the actual vs expected values.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "patch-merge-semantics",
+      "prompt": "Validate that PATCH /api/v1/clients/{id} with Content-Type: application/merge-patch+json and body {\"phoneNumber\": null} correctly deletes the phoneNumber field and leaves other fields untouched. Then validate that the same PATCH without phoneNumber in the body leaves phoneNumber unchanged.",
+      "expected_output": "Two-step test: seed a client with phoneNumber set, PATCH with {phoneNumber: null}, GET and assert phoneNumber is null while email/firstName/lastName are unchanged. Then reset, PATCH with a different field (e.g. {email: new}), GET and assert phoneNumber is still the original value.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

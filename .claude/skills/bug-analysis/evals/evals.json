@@ -1,0 +1,29 @@
+{
+  "skill_name": "bug-analysis",
+  "evals": [
+    {
+      "id": 0,
+      "name": "case-insensitive-search-returns-nothing",
+      "prompt": "GET /api/v1/clients?firstName=alice returns an empty page, but I can see a row with first_name='Alice' in psql. Diagnose and fix. Point me to the files and explain why.",
+      "expected_output": "Traces through ClientController.search → ClientService.search → ClientRepositoryImpl → ClientSpecifications. Identifies whether the issue is (a) the specification not using LOWER() on both sides, (b) the repo impl calling the wrong findAll overload, or (c) Pageable filtering out page 0. Points to specific file+line, does not patch symptoms in the controller.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "patch-null-does-not-delete",
+      "prompt": "Our PATCH /clients/{id} with Content-Type: application/merge-patch+json and body {\"email\": null} is supposed to clear the email field per RFC 7386, but it's leaving the old value. What's wrong?",
+      "expected_output": "Identifies the bug as either (a) ClientUpdater being called with ignoreNull=true when it should merge null through, or (b) JsonMergePatchUtils incorrectly treating null as skip. Points to the right file and explains the RFC 7386 semantic that null means 'delete the field'. Does not suggest changing the public PATCH contract.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "lazy-initialization-exception",
+      "prompt": "GET /api/v1/clients/{id} sometimes 500s with 'LazyInitializationException: could not initialize proxy - no Session'. The ApiError response has a correlationId abc-123. Diagnose the root cause and fix.",
+      "expected_output": "Identifies open-in-view: false as the enabling condition, and the root cause as the DTO reading a lazy association outside the service boundary. Recommends @EntityGraph(attributePaths = {...}) on the repository method, NOT @Transactional in the controller. Mentions checking the log for correlationId=abc-123 to confirm which endpoint.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

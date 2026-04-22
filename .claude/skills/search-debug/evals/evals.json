@@ -1,0 +1,29 @@
+{
+  "skill_name": "search-debug",
+  "evals": [
+    {
+      "id": 0,
+      "name": "substring-search-misunderstanding",
+      "prompt": "GET /clients?firstName=ali returns Alice and Natalia, but a user expected only Alice. Is this a bug?",
+      "expected_output": "Explains that the current pattern is substring match (LIKE '%val%'). 'ali' matches any row where first_name contains 'ali'. Note: because the spec is currently case-sensitive too, the user's example of 'Alice' matching is itself suspect — it only matches if the stored value contains lowercase 'ali'. The substring behaviour is by design; case-sensitivity is a separate bug. If the user wants exact-match, that's a breaking design change — flag it, don't unilaterally switch.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "total-elements-wrong",
+      "prompt": "My manager says GET /api/v1/clients returns totalElements=500 but we only have 50 clients in the DB. What's going on and how do I fix it?",
+      "expected_output": "Identifies the bug in ClientRepositoryImpl.search: calls the non-paginated findAll(specification), then wraps in PageImpl<>(clients, pageable, clients.size()) where clients.size() is the full result count NOT the DB total, and all rows are materialized into memory (pagination is a lie). Fix: replace with clientJpaRepository.findAll(specification, pageable) which returns a correct Page with real totalElements. Points to the exact file.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "case-sensitivity-surprise",
+      "prompt": "Someone inserted a client named 'Alice Martin'. GET /api/v1/clients?firstName=alice returns nothing, but GET /api/v1/clients?firstName=Alice returns the row. I thought search was case-insensitive — what's going on?",
+      "expected_output": "Identifies that ClientSpecifications.containsIgnoreCase is misnamed: the method name promises case-insensitive matching but the implementation calls criteriaBuilder.like(root.get(attr), '%val%') with NO LOWER() on either side. Result: search is case-sensitive. Shows the fix — wrap both sides with criteriaBuilder.lower(...). Also notes the LOWER(first_name) index in Flyway migrations is aligned with the intended (not actual) behaviour and will start being useful once the spec is fixed.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

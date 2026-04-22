@@ -1,0 +1,29 @@
+{
+  "skill_name": "validation",
+  "evals": [
+    {
+      "id": 0,
+      "name": "add-client-dto-constraints",
+      "prompt": "Add bean validation to the Client DTO so firstName and lastName are non-blank, email is a valid email, and phoneNumber (optional) if present must match ^\\+?[0-9]{10,15}$. Use useful error messages.",
+      "expected_output": "Applies @NotBlank(message=...) to firstName and lastName, @Email + @NotBlank to email, @Pattern(regexp='^\\+?[0-9]{10,15}$', message=...) to phoneNumber. Does NOT use @NotNull (weaker than @NotBlank). Confirms @Valid is already on the controller's @RequestBody. Does not duplicate the constraints on the entity.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "500-instead-of-400",
+      "prompt": "Someone reports that POST /api/v1/clients with body {\"firstName\": null} returns a 500 Internal Server Error instead of a 400 with a field-level error. Diagnose.",
+      "expected_output": "Identifies one of: (a) the DTO field is missing a @NotBlank/@NotNull constraint so the null reaches a downstream NPE, (b) the controller parameter is missing @Valid so constraints don't fire, or (c) GlobalExceptionHandler does not catch MethodArgumentNotValidException (unlikely — it's there). Investigates in that order and points to the exact fix.",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "cross-field-uniqueness-rule",
+      "prompt": "We need a rule: if email is present on a new Client POST, it must be unique across existing clients. Where should this validation go — the DTO, the service, a custom validator, the database? Recommend and implement.",
+      "expected_output": "Recommends a UNIQUE constraint at the DB level (Flyway migration, caught by Hibernate as a ConstraintViolationException) + a service-level pre-check that throws the project's domain exception (mapped to 409 Conflict by GlobalExceptionHandler) for a user-friendly response. DOES NOT put this in a JSR-303 custom validator (validators shouldn't perform I/O). Implements both pieces.",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "skill_name": "pagination",
+  "evals": [
+    {
+      "id": 0,
+      "name": "add-pagination-to-new-endpoint",
+      "prompt": "Add a new GET /api/v1/addresses endpoint that returns all client addresses paginated. Default page size 25, max 200. Allow sorting by clientId and seq only. Reuse our existing patterns — look at the clients search endpoint for reference. Return the result the way Spring normally returns a Page. No separate address service needs to exist yet — you can add the minimum wiring required (service method + repo method) to make the controller work, using the same module boundaries the rest of the project uses.",
+      "expected_output": "A controller method on a new or existing controller that accepts Pageable with @PageableDefault(size = 25), returns ResponseEntity<Page<AddressDto>>, enforces max size = 200, and only honors sorts on clientId and seq (other sort fields should be rejected or silently dropped). Repository method returns Page<AddressEntity> and uses @EntityGraph if the DTO reads any lazy association on ClientEntity. Service passes Pageable through. No manual PageImpl rebuild.",
+      "files": [],
+      "assertions": [
+        {"name": "controller-returns-page-of-dto", "text": "The controller method returns ResponseEntity<Page<...>> with a DTO type parameter — not List<>, not a custom response envelope."},
+        {"name": "controller-uses-pageable-default-size-25", "text": "The Pageable parameter on the controller method is annotated with @PageableDefault(size = 25)."},
+        {"name": "max-page-size-capped-at-200", "text": "Max page size is enforced at 200 somewhere — either via spring.data.web.pageable.max-page-size in application.yml, or per-endpoint via a size-validation mechanism. Unbounded max fails."},
+        {"name": "sort-whitelist-clientid-and-seq-only", "text": "Only sorts on clientId and seq are honored. Any other sort field is dropped (not rejected with 400)."},
+        {"name": "service-passes-pageable-through", "text": "The service method accepts Pageable and passes it through to the repository. No materializing a List and slicing."},
+        {"name": "uses-page-map-for-dto-mapping", "text": "Mapping from entity-page to DTO-page uses page.map(mapper::toDto) (or equivalent). No manual new PageImpl<>(...) rebuild."},
+        {"name": "respects-module-boundaries", "text": "New classes land in the correct modules per CLAUDE.md (controller + DTO + mapper in api, service + repo interface in core, repo impl in infrastructure)."}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "fix-n-plus-one-on-paged-search",
+      "prompt": "Something is wrong with GET /api/v1/clients?size=100. When I watch the Postgres logs I see 101 queries per request — 1 for the client page, then 100 more, one per client, each loading that client's addresses. The DTO includes the addresses list. This wasn't an issue when we only had a handful of clients but it's starting to hurt. Diagnose and fix. Point me to the exact file(s) that need to change and explain why your fix eliminates the extra queries.",
+      "expected_output": "Identifies this as classic N+1 caused by lazy loading of client.addresses on each row of the page. Fix is @EntityGraph(attributePaths = {\"addresses\"}) on ClientRepository.search (or the Specification-based search method), so Hibernate joins addresses in the same query. Bonus: mentions that open-in-view: false in this project means lazy access outside the service boundary would actually throw, making @EntityGraph the only correct fix.",
+      "files": [],
+      "assertions": [
+        {"name": "diagnosis-names-n-plus-one-with-lazy-addresses", "text": "DIAGNOSIS.md names the problem as an N+1 caused by lazy-loading of client.addresses when the mapper iterates the page."},
+        {"name": "fix-uses-entity-graph-on-addresses", "text": "The fix adds @EntityGraph(attributePaths = {\"addresses\"}) (or equivalent) on the ClientRepository search method."},
+        {"name": "fix-targets-repository-not-dto-or-mapper", "text": "Modified file(s) are at the repository layer. The Client DTO and ClientMapper are not changed."},
+        {"name": "explanation-predicts-single-joined-query", "text": "EXPLANATION.md says Hibernate will emit a single query (LEFT JOIN on addresses) instead of 1+N after the fix."},
+        {"name": "mentions-open-in-view-false-implication", "text": "Calls out that open-in-view: false makes session-scoped lazy loading unsafe outside the service boundary, reinforcing @EntityGraph as the right fix."},
+        {"name": "no-behavior-change-to-dto-shape", "text": "The Client DTO is unchanged — addresses still appear in the response exactly as before."}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "reject-unsafe-sort",
+      "prompt": "Security review pointed out something I hadn't thought about: GET /api/v1/clients?sort=email,asc works. So does ?sort=phoneNumber,desc. Basically any field on ClientEntity is sortable externally, including anything internal we might add later. They want us to restrict sortable fields to an explicit whitelist: firstName, lastName, and id only. Anything else should be silently dropped (not 400) so existing clients don't break. Implement this for the clients search endpoint. Also: they noticed pagination is sometimes unstable — the same row shows up on page 2 and page 3 when sorting by lastName. Fix that too.",
+      "expected_output": "Sort-sanitization logic applied to the search endpoint that filters Pageable.getSort() against a whitelist {firstName, lastName, id}, dropping (not rejecting) any other order. A stable-sort tiebreaker is appended — id — so rows never appear on two pages when the sort column has ties. Reasonably placed (controller adapter, a small @ModelAttribute resolver, or a utility method) — not scattered.",
+      "files": [],
+      "assertions": [
+        {"name": "whitelist-is-firstname-lastname-id", "text": "Allowed sort fields are exactly firstName, lastName, id."},
+        {"name": "unknown-sorts-dropped-not-400", "text": "Unknown sort fields are silently dropped. No 400 returned."},
+        {"name": "stable-tiebreaker-on-id-appended", "text": "id is appended as a tiebreaker on the sanitized Sort."},
+        {"name": "whitelist-lives-at-adapter-boundary", "text": "Sanitization is at a boundary (controller / resolver / utility) — not in the entity, not duplicated across layers."},
+        {"name": "existing-firstname-sort-still-works", "text": "An existing ?sort=firstName,asc request still works as before."}
+      ]
+    }
+  ]
+}
