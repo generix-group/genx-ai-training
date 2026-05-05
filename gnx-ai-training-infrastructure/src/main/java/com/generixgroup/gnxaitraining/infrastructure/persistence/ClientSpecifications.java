@@ -15,7 +15,6 @@ public final class ClientSpecifications {
     specification = andIfHasText(specification, firstName, "firstName");
     specification = andIfHasText(specification, lastName, "lastName");
     specification = andIfHasText(specification, email, "email");
-    specification = andIfHasText(specification, phoneNumber, "phoneNumber");
     return specification;
   }
 
