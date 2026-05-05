@@ -35,7 +35,7 @@ public final class ClientSpecifications {
       final String attributeName, final String value) {
     return (root, query, criteriaBuilder) ->
         criteriaBuilder.like(
-            criteriaBuilder.lower(root.get(attributeName)), toContainsPattern(value));
+            root.get(attributeName), toContainsPattern(value));
   }
 
   private static String toContainsPattern(final String value) {
